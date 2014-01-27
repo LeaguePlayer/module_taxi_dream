@@ -1,6 +1,7 @@
 jQuery(document).ready(function(){
 	var addressTimer = null;
 	var idArr = [];
+	var countAdd = 1;
 	
 	//function add select2 plugin on inputs
 	var bindSelects = function bindSelects(from, house){
@@ -73,22 +74,27 @@ jQuery(document).ready(function(){
 
 	//add address
 	jQuery('.add-address').on('click', function(){
-		var c = jQuery('.addresses').data('count');
-		c = parseInt(c, 10) + 1;
+		countAdd++;
 
 		var label = jQuery('<label>Еще один адрес</label>');
-		var from = jQuery('<input type="text" id="to_street' + c + '" name="to_street[]" />');
-		var house = jQuery('<input type="text" id="to_house' + c + '" name="to_house[]" />');
+		var from = jQuery('<input type="text" id="to_street' + countAdd + '" name="to_street[]" />');
+		var house = jQuery('<input type="text" id="to_house' + countAdd + '" name="to_house[]" />');
 		var del = jQuery('<a class="add-del" href="#">Удалить адрес</a>');
 
-		idArr.push({ street: '#to_street' + c, house: '#to_house' + c });
+		idArr.push({ street: '#to_street' + countAdd, house: '#to_house' + countAdd });
 
 		jQuery('.addresses').append('<div class="row"></div>').find('.row:last').append(label, from, house, del);
-		jQuery('.addresses').on('click', '.add-del', function(){
-			jQuery(this).closest('.row').remove();
-		});
 
 		bindSelects(from, house);
+	});
+
+	//del row
+	jQuery('.addresses').on('click', '.add-del', function(){
+		var i = jQuery('.addresses .add-del').index(jQuery(this));
+		idArr = delElInArr(idArr, i+1);
+
+		countAdd--;
+		jQuery(this).closest('.row').remove();
 	});
 
 	//calculate summ
@@ -105,7 +111,7 @@ jQuery(document).ready(function(){
 				var s = jQuery(idArr[i].street).select2('data');
 				var h = jQuery(idArr[i].house).select2('data');
 				// console.log(idArr[i], s, h);
-				if(s.text.length && h.text.length){
+				if(s && h && s.text.length && h.text.length){
 					addrs.push(s.text + ',' + h.text);
 				}
 			}
@@ -136,4 +142,16 @@ jQuery(document).ready(function(){
 	
 	//masked input for phone
 	$("#client_phone").mask("+7 (999) 999-99-99");
+
+	//delete el from array and return array
+	var delElInArr = function rewrite(arr, i){
+		var tmp = [];
+
+		for(el in arr){
+			if (el == i) continue;
+			tmp.push(arr[el]);
+		}
+
+		return tmp;
+	};
 });

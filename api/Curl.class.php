@@ -34,6 +34,17 @@ class Curl{
 		));
 	}
 
+	public function setContentType($type, $charset='UTF-8'){
+		// curl_setopt($this->_c,CURLOPT_HTTPHEADER, array(
+		// 	'Content-Type: '.$type
+		// ));
+	}
+
+	public function setPostData($params){
+		curl_setopt($this->_c, CURLOPT_POST, true);
+    	curl_setopt($this->_c, CURLOPT_POSTFIELDS, http_build_query($params));
+	}
+
 	public function exec(){
 		return curl_exec($this->_c);
 	}

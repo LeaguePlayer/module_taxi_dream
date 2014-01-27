@@ -1,6 +1,22 @@
 <?php require_once('api/TaxiApi.class.php'); ?>
 <?php
-		
+	
+	require_once('api/Curl.class.php');
+
+	$curl = new Curl('http://gates.smsgear.ru/http/gate.cgi');
+
+	$curl->setContentType('application/x-www-form-urlencode');
+	$curl->setPostData(array(
+		'user' => '26883_Artemev3',
+		'pass' => md5('1lkmkDPH'),
+		'action' => 'post_sms',
+		'message' => 'Тест',
+		'target' => '+79220448947'
+	));
+	var_dump($curl->exec());
+	// print_r($curl->getInfo());
+// echo rand(100000, 999999);
+
 if(isset($_GET['get_addresses']) || isset($_GET['get_houses']) || isset($_GET['analize'])){
 	
 	//Получаем адреса
@@ -48,7 +64,7 @@ if(isset($_GET['get_addresses']) || isset($_GET['get_houses']) || isset($_GET['a
 		<form action="" method="POST">
 			<div class="step1">
 				<h2>Шаг 1</h2>
-				<div class="addresses" data-count="1">
+				<div class="addresses">
 					<div class="row">
 						<label for="from_street">От куда вас забрать?</label>
 						<input type="text" id="from_street" name="from_street"/>

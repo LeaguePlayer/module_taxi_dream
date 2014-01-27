@@ -5,6 +5,7 @@ require_once('Curl.class.php');
 class TaxiApi {
 
 	private $_host = 'https://178.46.154.73:8089/';
+	private $_host2 = 'https://92.255.164.26:8089/';
 	private $_secretkey = '454545';
 
 	/**
@@ -21,19 +22,18 @@ class TaxiApi {
 				'street' => $street
 			);
 
-			$curl = new Curl($this->_host.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
+			$curl = new Curl($this->_host2.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
 			$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
 			header('Content-type: application/json');
 			$res = $curl->exec();
 			if (!$res) 
-				print_r($curl->getError());
+				echo $curl->getError();
 			else 
 				echo $res;
 		}
 
 		die();
-		//print $curl->exec(); die();
 	}
 
 	/**
@@ -50,7 +50,7 @@ class TaxiApi {
 				'house' => $house
 			);
 
-			$curl = new Curl($this->_host.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
+			$curl = new Curl($this->_host2.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
 			$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
 			header('Content-type: application/json');
@@ -67,7 +67,7 @@ class TaxiApi {
 	public function getTariffs(){
 
 		$params = array();
-		$curl = new Curl($this->_host.'common_api/1.0/get_tariffs_list?'.$this->getParamsUrl($params));
+		$curl = new Curl($this->_host2.'common_api/1.0/get_tariffs_list?'.$this->getParamsUrl($params));
 		$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
 		header('Content-type: application/json');
@@ -81,7 +81,7 @@ class TaxiApi {
 		$params = array(
 			'tariff_id' => 1
 		);
-		$curl = new Curl($this->_host.'common_api/1.0/calc_order_cost?'.$this->getParamsUrl($params));
+		$curl = new Curl($this->_host2.'common_api/1.0/calc_order_cost?'.$this->getParamsUrl($params));
 		$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
 		header('Content-type: application/json');
@@ -95,18 +95,42 @@ class TaxiApi {
 	public function analyzeRoute($from, $addresses){
 		header('Content-type: application/json');
 
-		//analyze route
-		$params = array(
-			'source' => $from,
-			'dest' => $addresses[0]
+		$calc_params = array(
+			'source_zone_id' => 0,
+			'dest_zone_id' => 0,
+			'distance_city' => 0,
+			'distance_country' => 0,
+			'source_distance_country' => 0
 		);
-		$curl = new Curl($this->_host.'common_api/1.0/analyze_route?'.$this->getParamsUrl($params));
-		$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
-		$res = $curl->exec();
-		if($res){
-			$res = json_decode($res);
-			if ($res->code != 0) die();
+		$fail = false;
+
+		//Проходим по адресам и суммируем киллометраж
+		foreach ($addresses as $address) {
+			//analyze route
+			$params = array(
+				'source' => $from,
+				'dest' => $address
+			);
+			$curl = new Curl($this->_host2.'common_api/1.0/analyze_route?'.$this->getParamsUrl($params));
+			$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
+
+			$res = $curl->exec();
+
+			if($res){
+				$res = json_decode($res);
+				if ($res->code != 0) $fail = true;
+
+				$calc_params['source_zone_id'] = $res->data->source_zone_id;
+				$calc_params['dest_zone_id'] = $res->data->dest_zone_id;
+				$calc_params['distance_city'] += $res->data->city_dist;
+				$calc_params['distance_country'] += $res->data->country_dist;
+				$calc_params['source_distance_country'] += $res->data->source_country_dist;
+			}else
+				$fail = true;
+		}
+
+		if(!$fail){
 
 			//tariff list
 			$tariffs = array( //tariffs ids
@@ -117,11 +141,11 @@ class TaxiApi {
 
 			//notes for tariff id
 			$notes = array(
-				1 => 'Примечание для тарифа с ID 1',
-				2 => 'Примечание для тарифа с ID 2',
-				7 => 'Примечание для тарифа с ID 7',
-				8 => 'Примечание для тарифа с ID 8',
-				11 => 'Примечание для тарифа с ID 11'
+				1 => 'Преимущества для тарифа с ID 1',
+				2 => 'Преимущества для тарифа с ID 2',
+				7 => 'Преимущества для тарифа с ID 7',
+				8 => 'Преимущества для тарифа с ID 8',
+				11 => 'Преимущества для тарифа с ID 11'
 			);
 
 			//час пик
@@ -139,13 +163,9 @@ class TaxiApi {
 					'tariff_id' => $value
 				);
 
-				$params['source_zone_id'] = $res->data->source_zone_id;
-				$params['dest_zone_id'] = $res->data->dest_zone_id;
-				$params['distance_city'] = $res->data->city_dist;
-				$params['distance_country'] = $res->data->country_dist;
-				$params['source_distance_country'] = $res->data->source_country_dist;
+				$params += $calc_params;
 
-				$curl = new Curl($this->_host.'common_api/1.0/calc_order_cost?'.$this->getParamsUrl($params));
+				$curl = new Curl($this->_host2.'common_api/1.0/calc_order_cost?'.$this->getParamsUrl($params));
 				$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
 				$result[$key] = json_decode($curl->exec());
@@ -171,10 +191,10 @@ class TaxiApi {
 			'street' => 'stree',
 			'max_addresses_count' => 10
 		);
-		$curl = new Curl($this->_host.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
+		$curl = new Curl($this->_host2.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
 		$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
-		print_r($this->_host.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
+		print_r($this->_host2.'common_api/1.0/get_addresses_like?'.$this->getParamsUrl($params));
 		//header('Content-type: application/json');
 		$result = json_decode($curl->exec(), true);
 		$this->pr_r($result);
@@ -185,7 +205,7 @@ class TaxiApi {
 					'crew_id' => $crew['id']
 				);
 
-				$curl = new Curl($this->_host.'common_api/1.0/get_crew_info?'.$this->getParamsUrl($params));
+				$curl = new Curl($this->_host2.'common_api/1.0/get_crew_info?'.$this->getParamsUrl($params));
 				$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 
 				$result = json_decode($curl->exec(), true);
