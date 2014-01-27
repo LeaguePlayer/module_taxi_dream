@@ -5,15 +5,15 @@
 
 	$curl = new Curl('http://gates.smsgear.ru/http/gate.cgi');
 
-	$curl->setContentType('application/x-www-form-urlencode');
-	$curl->setPostData(array(
-		'user' => '26883_Artemev3',
-		'pass' => md5('1lkmkDPH'),
-		'action' => 'post_sms',
-		'message' => 'Тест',
-		'target' => '+79220448947'
-	));
-	var_dump($curl->exec());
+	// $curl->setContentType('application/x-www-form-urlencode');
+	// $curl->setPostData(array(
+	// 	'user' => '26883_Artemev3',
+	// 	'pass' => md5('1lkmkDPH'),
+	// 	'action' => 'post_sms',
+	// 	'message' => 'Тест',
+	// 	'target' => '+79220448947'
+	// ));
+	// var_dump($curl->exec());
 	// print_r($curl->getInfo());
 // echo rand(100000, 999999);
 
