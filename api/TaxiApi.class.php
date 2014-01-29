@@ -170,6 +170,7 @@ class TaxiApi {
 
 				$result[$key] = json_decode($curl->exec());
 				$result[$key]->note = $notes[$value];
+				$result[$key]->tariff_id = $value;
 			}
 
 			echo json_encode($result);
@@ -212,6 +213,28 @@ class TaxiApi {
 				$this->pr_r($result);
 			}
 		}*/
+	}
+
+	public function order(array $post) {
+		$phone = str_replace(array("+"," ", "-", "(", ")"), "", $post['phone']);
+		$source_time = date('YmdHis', strtotime($post['source_time']));
+		// print_r($source_time); die();
+		$params = array(
+			'phone' => $phone,
+			'source' => $post['source'],
+			'source_time' => $source_time,
+			'dest' => $post['dest'],
+			'customer' => $post['customer'],
+			'comment' => $post['comment'],
+			'tariff_id' => $post['tariff_id'],
+			'is_prior' => $post['is_prior'],
+		);
+		$curl = new Curl($this->_host2.'common_api/1.0/create_order');
+		$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
+		$curl->setPostData($params);
+
+		header('Content-type: application/json');
+		echo $curl->exec();
 	}
 
 	private function getParamsUrl($array = array()){
