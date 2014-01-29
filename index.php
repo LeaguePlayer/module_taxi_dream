@@ -66,8 +66,6 @@ if ( isset($_POST['order']) ) {
 
 	$post = $_POST['order'];
 	$post['is_prior'] = 'true';
-	$post['source'] = 'test';
-	$post['dest'] = 'test';
 
 	$ta = new TaxiApi;
 	echo $ta->order($post);
