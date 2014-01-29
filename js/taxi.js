@@ -272,6 +272,12 @@ jQuery(document).ready(function(){
 					smsCode = null;
 					step4.hide();
 					step1.show();
+				} else if (data.code == 100) {
+					alert('Ваша заявка уже в обработке');
+					smsTimeout = null;
+					smsCode = null;
+					step4.hide();
+					step1.show();
 				}
 			});
 		});
