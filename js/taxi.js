@@ -287,6 +287,11 @@ jQuery(document).ready(function(){
 	$('.back').on('click', function(e) {
 		var self = $(this);
 		var step = self.closest('.step');
+		if ( step.hasClass('step4') ) {
+			smsTimeout = null;
+			smsCode = null;
+			$('input#sms_code').val('');
+		}
 		step.hide();
 		step.prev('.step').show();
 		return false;

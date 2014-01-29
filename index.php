@@ -17,7 +17,7 @@ if ( isset($_GET['send_sms']) && isset($_GET['phone']) ) {
 		'message' => (string)$randNumber,
 		'target' => (string)$target,
 	));
-	// $out = $curl->exec();
+	$curl->exec();
 	echo json_encode(array(
 		'sms_code' => $randNumber,
 		'timeout' => time() + (60),
@@ -117,7 +117,7 @@ if ( isset($_POST['order']) ) {
 
 					<div class="actions">
 						<a href="#" class="btn add-address">Добавить адрес</a>
-						<button type="submit" class="btn btn-primary calculate">Расчитать</button>
+						<a href="#" class="btn btn-primary calculate">Расчитать</a>
 					</div>
 				</fieldset>
 
@@ -145,7 +145,7 @@ if ( isset($_POST['order']) ) {
 						</tr>
 					</table>
 					<a href="#" class="btn back" data-to_step="1">Назад</a>
-					<button type="submit" class="btn btn-primary next">Далее</button>
+					<a href="#" class="btn btn-primary next">Далее</a>
 				</fieldset>
 
 
@@ -193,7 +193,7 @@ if ( isset($_POST['order']) ) {
 					<em><span class="require">*</span> - обязательные поля</em>
 					<div class="actions">
 						<a href="#" class="btn back">Назад</a>
-						<button type="submit" class="btn btn-primary next">Принять</button>
+						<a href="#" class="btn btn-primary next">Принять</a>
 					</div>
 				</fieldset>
 
@@ -218,7 +218,7 @@ if ( isset($_POST['order']) ) {
 
 					<div class="actions">
 						<a href="#" class="btn back">Назад</a>
-						<button type="submit" class="btn btn-primary order">Завершить</button>
+						<a href="#" class="btn btn-primary order">Завершить</a>
 					</div>
 				</fieldset>
 
