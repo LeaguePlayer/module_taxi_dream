@@ -228,6 +228,7 @@ class TaxiApi {
 			'comment' => $post['comment'],
 			'tariff_id' => $post['tariff_id'],
 			'is_prior' => $post['is_prior'],
+			'crew_group_id' => $post['crew_group_id'],
 		);
 		$curl = new Curl($this->_host2.'common_api/1.0/create_order');
 		$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);

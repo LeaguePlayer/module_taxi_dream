@@ -250,6 +250,19 @@ jQuery(document).ready(function(){
 				return;
 			}
 
+			var crew_group_id;
+			switch ( +$('input[name=tariff]:checked').val() ) {
+				case 1:
+					crew_group_id = 40;
+					break;
+				case 2:
+					crew_group_id = 45;
+					break;
+				case 3:
+					crew_group_id = 65;
+					break;
+			}
+
 			$.ajax({
 				url: '',
 				type: 'POST',
@@ -262,6 +275,7 @@ jQuery(document).ready(function(){
 						customer: $('#client_name', step3).val(),
 						comment: $('#client_comment', step3).val(),
 						tariff_id: $('input[name="tariff"]:checked', step2).data('tariff_id'),
+						crew_group_id: crew_group_id,
 						is_prior: true,
 					}
 				}
