@@ -218,7 +218,21 @@ class TaxiApi {
 	public function order(array $post) {
 		$phone = str_replace(array("+"," ", "-", "(", ")"), "", $post['phone']);
 		$source_time = date('YmdHis', strtotime($post['source_time']));
-		// print_r($source_time); die();
+		
+		if ( isset( $post['crew_group_name'] ) ) {
+			$p = array();
+			$curl = new Curl($this->_host2.'common_api/1.0/get_crew_groups_list?'.$this->getParamsUrl($p));
+			$curl->setSignature($this->getParamsUrl($p), $this->_secretkey);
+			$res = json_decode($curl->exec());
+			$crew_groups = $res->data->crew_groups;
+			foreach ( $crew_groups as $group ) {
+				if ( $group->name == $post['crew_group_name'] ) {
+					$crew_group_id = $group->id;
+					break;
+				}
+			}
+		}
+
 		$params = array(
 			'phone' => $phone,
 			'source' => $post['source'],
@@ -228,8 +242,11 @@ class TaxiApi {
 			'comment' => $post['comment'],
 			'tariff_id' => $post['tariff_id'],
 			'is_prior' => $post['is_prior'],
-			'crew_group_id' => $post['crew_group_id'],
 		);
+		if ( isset($crew_group_id) ) {
+			$params['crew_group_id'] = $crew_group_id;
+		}
+
 		$curl = new Curl($this->_host2.'common_api/1.0/create_order');
 		$curl->setSignature($this->getParamsUrl($params), $this->_secretkey);
 		$curl->setPostData($params);
