@@ -256,9 +256,9 @@ jQuery(document).ready(function(){
 				data: {
 					order: {
 						phone: $('#client_phone', step3).val(),
-						source: $('#from_street').select2('data') + ', ' + $('#from_house').select2('data'),
+						source: $('#from_street').select2('data').text + ', ' + $('#from_house').select2('data').text,
 						source_time: $('#client_sourcetime', step3).val(),
-						dest: $('#to_street1').select2('data') + ', ' + $('#to_house1').select2('data'),
+						dest: $('#to_street1').select2('data').text + ', ' + $('#to_house1').select2('data').text,
 						customer: $('#client_name', step3).val(),
 						comment: $('#client_comment', step3).val(),
 						tariff_id: $('input[name="tariff"]:checked', step2).data('tariff_id'),
